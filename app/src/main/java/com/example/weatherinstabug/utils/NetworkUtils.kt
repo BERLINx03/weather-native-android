@@ -4,7 +4,7 @@ package com.example.weatherinstabug.utils
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 
-class NetworkState(private val connectivityManager: ConnectivityManager) {
+class NetworkUtils(private val connectivityManager: ConnectivityManager) {
 
     fun hasValidInternet (): Boolean {
         val activeNetwork = connectivityManager.activeNetwork
