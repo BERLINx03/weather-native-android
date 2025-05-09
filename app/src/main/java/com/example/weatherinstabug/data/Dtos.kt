@@ -118,6 +118,7 @@ data class Day(
     val datetime: String,
     val tempmax: Double,
     val tempmin: Double,
+    val temp: Double,
     val conditions: String,
     val icon: String,
     val precipprob: Double,
@@ -139,12 +140,14 @@ data class Day(
         dest.writeDouble(windspeed)
         dest.writeString(winddir)
         dest.writeTypedList(hours)
+        dest.writeDouble(temp)
     }
 
     constructor(parcel: Parcel) : this(
         datetime = parcel.readString() ?: "",
         tempmax = parcel.readDouble(),
         tempmin = parcel.readDouble(),
+        temp = parcel.readDouble(),
         conditions = parcel.readString() ?: "",
         icon = parcel.readString() ?: "",
         precipprob = parcel.readDouble(),
@@ -170,7 +173,8 @@ data class Hour(
     val datetime: String,
     val temp: Double,
     val windspeed: Double,
-    val icon: String
+    val icon: String,
+    val precipprob: Double
 ) : Parcelable {
     override fun describeContents(): Int {
         return 0
@@ -181,13 +185,15 @@ data class Hour(
         dest.writeDouble(temp)
         dest.writeDouble(windspeed)
         dest.writeString(icon)
+        dest.writeDouble(precipprob)
     }
 
     constructor(parcel: Parcel) : this(
         datetime = parcel.readString() ?: "",
         temp = parcel.readDouble(),
         windspeed = parcel.readDouble(),
-        icon = parcel.readString() ?: ""
+        icon = parcel.readString() ?: "",
+        precipprob = parcel.readDouble()
     )
 
     companion object CREATOR : Parcelable.Creator<Hour> {
