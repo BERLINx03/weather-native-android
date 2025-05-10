@@ -17,6 +17,9 @@ class WeatherController(
 
     private var callback: StateCallback? = null
 
+    /**
+     * ## The activity
+     */
     fun registerCallback(callback: StateCallback) {
         this.callback = callback
     }

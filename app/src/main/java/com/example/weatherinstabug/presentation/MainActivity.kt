@@ -1,6 +1,5 @@
 package com.example.weatherinstabug.presentation
 
-import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
@@ -9,7 +8,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 import com.example.weatherinstabug.WeatherApplication
 import com.example.weatherinstabug.data.WeatherResponse
 import com.example.weatherinstabug.presentation.state.WeatherScreenState
@@ -18,25 +16,10 @@ import com.example.weatherinstabug.presentation.ui.components.ErrorScreen
 import com.example.weatherinstabug.presentation.ui.components.LoadingScreen
 import com.example.weatherinstabug.presentation.ui.components.PermissionScreen
 
-class MainActivity : ComponentActivity(), WeatherController.StateCallback {
-
-    private val requiredPermission = arrayOf(
-        android.Manifest.permission.ACCESS_FINE_LOCATION,
-        android.Manifest.permission.ACCESS_COARSE_LOCATION,
-        android.Manifest.permission.INTERNET,
-        android.Manifest.permission.ACCESS_NETWORK_STATE
-    )
-
-    private fun hasRequiredPermissions(): Boolean {
-        return requiredPermission.all {
-            ContextCompat.checkSelfPermission(
-                this,
-                it
-            ) == PackageManager.PERMISSION_GRANTED
-        }
-    }
+class MainActivity : ComponentActivity(), WeatherController.StateCallback, PermissionsHandler.PermissionCallback {
 
     private var weatherController: WeatherController? = null
+    private var permissionsHandler: PermissionsHandler? = null
 
     private var screenState by mutableStateOf<WeatherScreenState>(WeatherScreenState.Loading)
 
@@ -47,22 +30,26 @@ class MainActivity : ComponentActivity(), WeatherController.StateCallback {
         weatherController = WeatherController(applicationContext, repository)
         weatherController?.registerCallback(this)
 
+        permissionsHandler = PermissionsHandler(this)
+
         if (savedInstanceState != null) {
-            val savedWeather = savedInstanceState.getParcelable<WeatherResponse>("weatherState")
+            val savedWeather: WeatherResponse? = savedInstanceState.getParcelable("weatherState")
             if (savedWeather != null) {
                 screenState = WeatherScreenState.Success(savedWeather)
             }
         } else {
-            if (!hasRequiredPermissions()) {
-                screenState = WeatherScreenState.PermissionRequired
-                ActivityCompat.requestPermissions(this, requiredPermission, PERMISSION_REQUEST_CODE)
-            } else {
+            if (permissionsHandler?.hasPermissions(PermissionsHandler.WEATHER_APP_PERMISSIONS) == true) {
                 weatherController?.fetchWeather()
+            } else {
+                screenState = WeatherScreenState.PermissionRequired
+                permissionsHandler?.requestPermissions(
+                    PermissionsHandler.WEATHER_APP_PERMISSIONS,
+                    PERMISSION_REQUEST_CODE
+                )
             }
         }
 
         setContent {
-            Log.i("Weather", "Current state: $screenState")
             when (val state = screenState) {
                 is WeatherScreenState.Loading -> LoadingScreen()
                 is WeatherScreenState.Error -> ErrorScreen(state.message) {
@@ -71,7 +58,7 @@ class MainActivity : ComponentActivity(), WeatherController.StateCallback {
                 is WeatherScreenState.Success -> WeatherApp(weatherResponse = state.data)
                 is WeatherScreenState.PermissionRequired -> PermissionScreen {
                     ActivityCompat.requestPermissions(
-                        this, requiredPermission, PERMISSION_REQUEST_CODE
+                        this, PermissionsHandler.WEATHER_APP_PERMISSIONS, PERMISSION_REQUEST_CODE
                     )
                 }
             }
@@ -82,6 +69,18 @@ class MainActivity : ComponentActivity(), WeatherController.StateCallback {
         screenState = state
     }
 
+
+    override fun onPermissionResult(granted: Boolean) {
+        if (granted) {
+            weatherController?.fetchWeather()
+        } else {
+            screenState = WeatherScreenState.Error("Location permissions are required")
+        }
+    }
+
+    /**
+     * ## `Deprecated` but i use it cause my phone doesn't support the result api (API 30+)
+     */
     @Deprecated("This method has been deprecated in favor of using the Activity Result API\n      which brings increased type safety via an {@link ActivityResultContract} and the prebuilt\n      contracts for common intents available in\n      {@link androidx.activity.result.contract.ActivityResultContracts}, provides hooks for\n      testing, and allow receiving results in separate, testable classes independent from your\n      activity. Use\n      {@link #registerForActivityResult(ActivityResultContract, ActivityResultCallback)} passing\n      in a {@link RequestMultiplePermissions} object for the {@link ActivityResultContract} and\n      handling the result in the {@link ActivityResultCallback#onActivityResult(Object) callback}.")
     override fun onRequestPermissionsResult(
         requestCode: Int,
@@ -91,11 +90,7 @@ class MainActivity : ComponentActivity(), WeatherController.StateCallback {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
 
         if (requestCode == PERMISSION_REQUEST_CODE) {
-            if (grantResults.isNotEmpty() && grantResults.all { it == PackageManager.PERMISSION_GRANTED }) {
-                weatherController?.fetchWeather()
-            } else {
-                screenState = WeatherScreenState.Error("Location permissions are required")
-            }
+            permissionsHandler?.handlePermissionResult(grantResults, this)
         }
     }
 
@@ -106,10 +101,17 @@ class MainActivity : ComponentActivity(), WeatherController.StateCallback {
         }
     }
 
+    /**
+     * ### Cleaning resources and removing pointers
+     */
     override fun onDestroy() {
+        super.onDestroy()
+
         weatherController?.clear()
         weatherController = null
-        super.onDestroy()
+
+        permissionsHandler?.clear()
+        permissionsHandler = null
     }
 
     companion object {
