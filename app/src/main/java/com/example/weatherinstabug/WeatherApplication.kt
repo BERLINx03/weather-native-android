@@ -21,20 +21,13 @@ class WeatherApplication: Application() {
 
         WeatherCache.init(this)
 
-        lateinit var mCoordinates: Pair<Double, Double>
         val connectivityManager = getSystemService(CONNECTIVITY_SERVICE) as ConnectivityManager
 
-        LocationUtils(this, object : LocationUtils.LocationCallback {
-            override fun onLocationReceived(coordinates: Pair<Double, Double>) {
-                mCoordinates = coordinates
-            }
-        })
 
         appModule = AppModuleImpl(
             appCtx = this,
             networkUtils = NetworkUtils(connectivityManager),
             weatherCache = WeatherCache,
-            coordinates = mCoordinates
         )
     }
 }

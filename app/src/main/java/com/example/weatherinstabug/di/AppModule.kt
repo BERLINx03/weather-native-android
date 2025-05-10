@@ -15,14 +15,12 @@ class AppModuleImpl(
     private val appCtx: Context,
     private val networkUtils: NetworkUtils,
     private val weatherCache: WeatherCache,
-    private val coordinates: Pair<Double, Double>
 ): AppModule{
     override val weatherRepository: WeatherRepository by lazy {
         WeatherRepositoryImpl(
             context = appCtx,
             networkUtils = networkUtils,
             weatherCache = weatherCache,
-            coordinates = coordinates
         )
     }
 }

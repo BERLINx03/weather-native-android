@@ -25,7 +25,6 @@ class WeatherRepositoryImpl(
     private val weatherCache: WeatherCache,
     context: Context,
     private val networkUtils: NetworkUtils,
-    private val coordinates: Pair<Double, Double>
 ) : WeatherRepository {
     lateinit var conn: HttpURLConnection
     private val baseUrl = Constants.BASE_URL
@@ -47,12 +46,12 @@ class WeatherRepositoryImpl(
         backgroundExecutor.shutdown()
     }
 
-    override fun fetchCurrentWeather(callback: WeatherCallback) {
+    override fun fetchCurrentWeather(coordinates: Pair<Double, Double>, callback: WeatherCallback) {
         val url = URL("$baseUrl${coordinates.first},${coordinates.second}?key=$key")
         fetchWeather(url, callback)
     }
 
-    override fun fetchFiveDaysForecastWeather(callback: WeatherCallback) {
+    override fun fetchFiveDaysForecastWeather(coordinates: Pair<Double, Double>, callback: WeatherCallback) {
         val url = URL("$baseUrl${coordinates.first},${coordinates.second}/$today/$lastDay?key=$key")
         fetchWeather(url,callback)
     }
