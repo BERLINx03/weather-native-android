@@ -5,33 +5,18 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Button
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.example.weatherinstabug.WeatherApplication
 import com.example.weatherinstabug.data.WeatherResponse
-import com.example.weatherinstabug.domain.repository.WeatherCallback
-import com.example.weatherinstabug.domain.repository.WeatherRepository
 import com.example.weatherinstabug.presentation.state.WeatherScreenState
 import com.example.weatherinstabug.presentation.ui.WeatherApp
+import com.example.weatherinstabug.presentation.ui.components.ErrorScreen
+import com.example.weatherinstabug.presentation.ui.components.LoadingScreen
 import com.example.weatherinstabug.presentation.ui.components.PermissionScreen
-import com.example.weatherinstabug.utils.LocationUtils
 
 class MainActivity : ComponentActivity(), WeatherController.StateCallback {
 
@@ -59,9 +44,8 @@ class MainActivity : ComponentActivity(), WeatherController.StateCallback {
         super.onCreate(savedInstanceState)
 
         val repository = (application as WeatherApplication).appContainer.weatherRepository
-        val controller = WeatherController(applicationContext, repository)
-        controller.setCallback(this)
-        weatherController = controller
+        weatherController = WeatherController(applicationContext, repository)
+        weatherController?.registerCallback(this)
 
         if (savedInstanceState != null) {
             val savedWeather = savedInstanceState.getParcelable<WeatherResponse>("weatherState")
@@ -130,34 +114,5 @@ class MainActivity : ComponentActivity(), WeatherController.StateCallback {
 
     companion object {
         private const val PERMISSION_REQUEST_CODE = 100
-    }
-}
-
-@Composable
-fun LoadingScreen() {
-    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        CircularProgressIndicator()
-    }
-}
-
-@Composable
-fun ErrorScreen(errorMessage: String, onRetry: () -> Unit) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text(
-            text = "Error: $errorMessage",
-            color = Color.Red,
-            textAlign = TextAlign.Center,
-            modifier = Modifier.padding(bottom = 16.dp)
-        )
-
-        Button(onClick = onRetry) {
-            Text("Retry")
-        }
     }
 }

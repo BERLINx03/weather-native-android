@@ -15,9 +15,9 @@ class WeatherController(
         fun onStateChanged(state: WeatherScreenState)
     }
 
-    var callback: StateCallback? = null
+    private var callback: StateCallback? = null
 
-    fun setCallback(callback: StateCallback) {
+    fun registerCallback(callback: StateCallback) {
         this.callback = callback
     }
 
