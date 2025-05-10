@@ -4,7 +4,6 @@ import android.content.Context
 import com.example.weatherinstabug.data.local.WeatherCache
 import com.example.weatherinstabug.data.repository.WeatherRepositoryImpl
 import com.example.weatherinstabug.domain.repository.WeatherRepository
-import com.example.weatherinstabug.utils.LocationUtils
 import com.example.weatherinstabug.utils.NetworkUtils
 
 interface AppModule {

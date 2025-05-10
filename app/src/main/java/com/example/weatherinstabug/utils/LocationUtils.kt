@@ -143,15 +143,6 @@ class LocationUtils(private val context: Context, private val locationCallback: 
         }
     }
 
-    fun isGpsAvailable(): Boolean {
-        return try {
-            locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
-        } catch (e: Exception) {
-            Log.e("LocationUtils", "Error checking GPS status: ${e.message}")
-            false
-        }
-    }
-
     private fun reportError(message: String) {
         if (!hasReportedError) {
             hasReportedError = true

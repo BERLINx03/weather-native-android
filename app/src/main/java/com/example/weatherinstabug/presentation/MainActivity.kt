@@ -90,46 +90,38 @@ class MainActivity : ComponentActivity() {
 
     private fun initializeLocationAndWeather() {
         if (hasRequiredPermissions()) {
-            Log.d("MainActivity", "Permissions granted, initializing location")
             try {
                 LocationUtils(this, object : LocationUtils.LocationCallback {
                     override fun onLocationReceived(coordinates: Pair<Double, Double>) {
-                        Log.d("MainActivity", "Location received: $coordinates")
                         locationState = coordinates
                         fetchWeather(coordinates)
                     }
 
                     override fun onLocationError(errorMessage: String) {
-                        Log.e("MainActivity", "Location error: $errorMessage")
                         this@MainActivity.errorMessage = errorMessage
                         isLoading = false
                     }
                 })
             } catch (e: Exception) {
-                Log.e("MainActivity", "Error initializing location: ${e.message}")
                 errorMessage = "Error initializing location services: ${e.message}"
                 isLoading = false
             }
         } else {
-            Log.e("MainActivity", "Permissions still not available")
             errorMessage = "Location permissions are required"
             isLoading = false
         }
     }
 
     private fun fetchWeather(coordinates: Pair<Double, Double>) {
-        Log.d("MainActivity", "Fetching weather for coordinates: $coordinates")
         weatherRepository.fetchCurrentWeather(
             coordinates = coordinates,
             callback = object : WeatherCallback {
                 override fun onWeatherDataReceived(weatherResponse: WeatherResponse) {
-                    Log.d("MainActivity", "Weather data received")
                     weatherState = weatherResponse
                     isLoading = false
                 }
 
                 override fun onError(errorMessage: String) {
-                    Log.e("MainActivity", "Weather fetch error: $errorMessage")
                     this@MainActivity.errorMessage = errorMessage
                     isLoading = false
                 }
@@ -140,12 +132,9 @@ class MainActivity : ComponentActivity() {
     @Deprecated("This method has been deprecated in favor of using the Activity Result API...")
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        Log.d("MainActivity", "Permission result: ${grantResults.joinToString()}")
         if (requestCode == 0 && grantResults.isNotEmpty() && grantResults.all { it == PackageManager.PERMISSION_GRANTED }) {
-            Log.d("MainActivity", "All permissions granted, initializing")
             initializeLocationAndWeather()
         } else {
-            Log.e("MainActivity", "Permissions denied or incomplete")
             errorMessage = "Location permissions denied"
             isLoading = false
         }

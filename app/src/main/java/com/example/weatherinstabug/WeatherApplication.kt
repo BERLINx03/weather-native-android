@@ -5,7 +5,6 @@ import android.net.ConnectivityManager
 import com.example.weatherinstabug.data.local.WeatherCache
 import com.example.weatherinstabug.di.AppModule
 import com.example.weatherinstabug.di.AppModuleImpl
-import com.example.weatherinstabug.utils.LocationUtils
 import com.example.weatherinstabug.utils.NetworkUtils
 
 class WeatherApplication: Application() {
