@@ -74,7 +74,6 @@ fun DayInfo(
     ) {
         Box(
             modifier = Modifier
-                .fillMaxSize()
                 .background(Color(0xFF6F92CC))
         ) {
             Column(

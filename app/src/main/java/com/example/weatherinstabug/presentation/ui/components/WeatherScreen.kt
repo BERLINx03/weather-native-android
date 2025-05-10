@@ -57,14 +57,14 @@ fun WeatherScreen(
                     Text(
                         text = address,
                         fontWeight = FontWeight.SemiBold,
-                        fontSize = 18.sp,
+                        fontSize = 22.sp,
                         color = Color.White
                     )
                 } else {
                     Text(
                         text = weatherResponse.timezone,
                         fontWeight = FontWeight.SemiBold,
-                        fontSize = 18.sp,
+                        fontSize = 22.sp,
                         color = Color.White
                     )
                 }
@@ -179,7 +179,8 @@ fun WeatherScreen(
         }
         item {
             HourlyForecast(
-                hours = weatherResponse.days[0].hours
+                hours = weatherResponse.days[0].hours,
+                modifier = Modifier.padding(12.dp)
             )
         }
         item {

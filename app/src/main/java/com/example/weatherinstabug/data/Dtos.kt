@@ -10,6 +10,7 @@ data class WeatherResponse(
     val resolvedAddress: String,
     val description: String,
     val currentConditions: CurrentConditions,
+    val tzoffset: Int,
     val days: List<Day>
 ): Parcelable {
     override fun describeContents(): Int {
@@ -24,6 +25,7 @@ data class WeatherResponse(
         dest.writeString(description)
         dest.writeParcelable(currentConditions, flags)
         dest.writeTypedList(days)
+        dest.writeInt(tzoffset)
     }
 
     constructor(parcel: Parcel) : this(
@@ -32,6 +34,7 @@ data class WeatherResponse(
         timezone = parcel.readString() ?: "",
         resolvedAddress = parcel.readString() ?: "",
         description = parcel.readString() ?: "",
+        tzoffset = parcel.readInt(),
         currentConditions = parcel.readParcelable(CurrentConditions::class.java.classLoader) ?: CurrentConditions("", 0.0, 0.0, 0.0, 0.0, 0, 0.0, 0.0, 0.0, "", "", "", "", 0.0),
         days = mutableListOf<Day>().apply {
             parcel.readTypedList(this, Day.CREATOR)

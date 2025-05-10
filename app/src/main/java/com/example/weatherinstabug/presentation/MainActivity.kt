@@ -9,7 +9,9 @@ import androidx.compose.runtime.setValue
 import com.example.weatherinstabug.data.WeatherResponse
 import com.example.weatherinstabug.data.repository.WeatherRepositoryImpl
 import com.example.weatherinstabug.domain.repository.WeatherCallback
+import com.example.weatherinstabug.presentation.ui.WeatherApp
 import com.example.weatherinstabug.presentation.ui.components.WeatherForecast
+import com.example.weatherinstabug.presentation.ui.components.WeatherScreen
 
 class MainActivity : ComponentActivity() {
     private var weatherState by mutableStateOf<WeatherResponse?>(null)
@@ -29,7 +31,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             if (weatherState != null) {
-                WeatherForecast(weatherResponse = weatherState!!)
+                WeatherApp(weatherResponse = weatherState!!)
             }
         }
     }

@@ -13,6 +13,7 @@ fun parseResponseIntoWeather(response: String): WeatherResponse {
     val timezone = jsonObj.getString("timezone")
     val resolvedAddress = jsonObj.getString("resolvedAddress")
     val description = jsonObj.getString("description")
+    val tzoffset = jsonObj.getInt("tzoffset")
 
     // Parse current conditions
     val currentConditions = jsonObj.getJSONObject("currentConditions")
@@ -78,6 +79,7 @@ fun parseResponseIntoWeather(response: String): WeatherResponse {
         resolvedAddress = resolvedAddress,
         description = description,
         currentConditions = current,
-        days = days
+        days = days,
+        tzoffset = tzoffset
     )
 }

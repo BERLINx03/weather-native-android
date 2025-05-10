@@ -44,12 +44,14 @@ fun HourlyForecast(
 ) {
     Card(
         modifier = modifier
-            .padding(16.dp)
             .height(160.dp)
             .clip(MaterialTheme.shapes.large),
         colors = CardDefaults.cardColors(
             containerColor = Color(0xFF6F92CC)
         ),
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = 4.dp
+        )
     ) {
         Box(
             modifier = Modifier
@@ -81,7 +83,7 @@ fun HourlyForecast(
             ) {
                 items(hours) { hour ->
                     HourlyForecastItem(
-                        modifier = modifier.padding(start = 8.dp, bottom = 8.dp, top = 8.dp),
+                        modifier = Modifier.padding(start = 8.dp, bottom = 8.dp, top = 8.dp),
                         hour = hour
                     )
                 }

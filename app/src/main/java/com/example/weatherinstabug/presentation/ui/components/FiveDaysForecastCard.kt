@@ -43,6 +43,9 @@ fun FiveDaysForecastCard(
         colors = CardDefaults.cardColors(
             containerColor = Color(0xFF6F92CC)
         ),
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = 4.dp
+        )
     ) {
         Column(
             modifier = Modifier
