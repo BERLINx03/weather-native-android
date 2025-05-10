@@ -24,7 +24,6 @@ class WeatherApplication: Application() {
 
 
         appModule = AppModuleImpl(
-            appCtx = this,
             networkUtils = NetworkUtils(connectivityManager),
             weatherCache = WeatherCache,
         )
