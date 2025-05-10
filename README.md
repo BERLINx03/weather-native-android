@@ -1,10 +1,43 @@
-# Instabug Weather Task
+# Weather App
 
-This project demonstrates a weather application built with pure Android SDK components, without relying on third-party libraries.
+A clean, modern weather application built with pure Android SDK components.
+
+## Features
+
+- Current weather conditions with temperature display
+- 5-day weather forecast with detailed daily information
+- 24-hour forecast with hourly predictions
+- Location-based weather data
+- Pull-to-refresh functionality for latest updates
+- Offline support with cached weather data
+- Smooth animations and transitions
+- Modern UI with consistent color theming
+
+## Screenshots
+
+<div align="center">
+  <img src="app/sampledata/weather_1.png" alt="Weather App Main Screen" width="300"/>
+  <img src="app/sampledata/weather_2.png" alt="Weather App Forecast Screen" width="300"/>
+</div>
+
+## Technical Details
+
+This project demonstrates building a weather application using only the Android core SDK:
+
+- No third-party libraries (no Retrofit, Volley, Coroutines, Room, etc.)
+- Uses ThreadExecutor instead of Coroutines
+- Uses HttpURLConnection instead of Ktor
+- Implements state saving with Parcelable instead of ViewModel
+- Uses SharedPreferences for data caching instead of Room
+- Uses LocationManager instead of FusedLocationProviderClient
+- Uses org.json for parsing instead of GSON or Moshi
+- Clean architecture with separation of concerns
+- Responsive UI built with Jetpack Compose
 
 ## Implementation Choices
 
 ### Core SDK Approach
+
 As specified in the requirements, this application avoids third-party libraries by using:
 
 - **ThreadExecutor** instead of Coroutines for background operations
@@ -19,18 +52,20 @@ As specified in the requirements, this application avoids third-party libraries 
 The application follows clean architecture principles with three distinct layers:
 
 1. **Data Layer**
-    - DTOs (Data Transfer Objects) for API responses
-    - Repository implementation
-    - Local and remote data sources
+
+   - DTOs (Data Transfer Objects) for API responses
+   - Repository implementation
+   - Local and remote data sources
 
 2. **Domain Layer**
-    - Business models
-    - Repository interfaces
+
+   - Business models
+   - Repository interfaces
 
 3. **Presentation Layer**
-    - UI models with Parcelable implementation
-    - Controllers for business logic
-    - Compose UI components
+   - UI models with Parcelable implementation
+   - Controllers for business logic
+   - Compose UI components
 
 ### Key Features
 
