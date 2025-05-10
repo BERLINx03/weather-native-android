@@ -17,7 +17,7 @@ A clean, modern weather application built with pure Android SDK components.
 
 <div align="center">
   <img src="app/sampledata/weather_1.png" alt="Weather App Main Screen" width="300"/>
-  <img src="app/sampledata/weather_2.png" alt="Weather App Forecast Screen" width="300"/>
+  <img src="app/sampledata/weather-ezgif.com-video-to-gif-converter.gif" alt="Weather App Demo" width="300"/>
 </div>
 
 ## Technical Details
