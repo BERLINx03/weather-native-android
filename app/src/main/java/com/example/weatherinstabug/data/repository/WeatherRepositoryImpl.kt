@@ -1,5 +1,6 @@
 package com.example.weatherinstabug.data.repository
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Handler
 import android.os.Looper
@@ -19,11 +20,12 @@ import java.net.URL
 import java.time.LocalDate
 import java.util.concurrent.Executors
 
+@SuppressLint("MissingPermission")
 class WeatherRepositoryImpl(
-    weatherCache: WeatherCache,
+    private val weatherCache: WeatherCache,
     context: Context,
     private val networkUtils: NetworkUtils,
-    private val locationUtils: LocationUtils
+    private val coordinates: Pair<Double, Double>
 ) : WeatherRepository {
     lateinit var conn: HttpURLConnection
     private val baseUrl = Constants.BASE_URL
@@ -37,9 +39,6 @@ class WeatherRepositoryImpl(
     private val mainLooper = Looper.getMainLooper()
     private val handler = Handler(mainLooper)
 
-    private var cachedWeather =  weatherCache.weather
-
-    val coordinates = locationUtils.coordinates
 
     init {
         weatherCache.init(context)
@@ -48,12 +47,12 @@ class WeatherRepositoryImpl(
         backgroundExecutor.shutdown()
     }
 
-    override fun fetchCurrentWeather(coordinates: Pair<Double, Double>, callback: WeatherCallback) {
+    override fun fetchCurrentWeather(callback: WeatherCallback) {
         val url = URL("$baseUrl${coordinates.first},${coordinates.second}?key=$key")
         fetchWeather(url, callback)
     }
 
-    override fun fetchFiveDaysForecastWeather(coordinates: Pair<Double, Double>, callback: WeatherCallback) {
+    override fun fetchFiveDaysForecastWeather(callback: WeatherCallback) {
         val url = URL("$baseUrl${coordinates.first},${coordinates.second}/$today/$lastDay?key=$key")
         fetchWeather(url,callback)
     }
@@ -75,7 +74,7 @@ class WeatherRepositoryImpl(
 
                     Log.i("WeatherRemote", "my response is : ${parseResponseIntoWeather(response)}")
 
-                    cachedWeather = response
+                    weatherCache.weather = response
 
                     handler.post {
                         callback.onWeatherDataReceived(parseResponseIntoWeather(response))
@@ -99,7 +98,7 @@ class WeatherRepositoryImpl(
                     conn.disconnect()
                 }
             } else {
-                cachedWeather?.let {
+                weatherCache.weather?.let {
                     handler.post {
                         callback.onWeatherDataReceived(parseResponseIntoWeather(it))
                     }

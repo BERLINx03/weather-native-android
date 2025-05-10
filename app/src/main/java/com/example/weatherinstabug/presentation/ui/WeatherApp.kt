@@ -17,26 +17,28 @@ fun WeatherApp(
     modifier: Modifier = Modifier,
     weatherResponse: WeatherResponse
 ) {
-   val navController = rememberNavController()
-
+    val navController = rememberNavController()
     NavHost(
         navController = navController,
         startDestination = Screens.WeatherScreen.route,
         modifier = modifier,
-        enterTransition = { slideInHorizontally{ it } },
-        exitTransition = { slideOutHorizontally{ -it } },
-        popEnterTransition = { slideInHorizontally{ -it } },
-        popExitTransition = { slideOutHorizontally{ it } }
-    ){
-        composable(Screens.WeatherScreen.route){
+        enterTransition = { slideInHorizontally { it } },
+        exitTransition = { slideOutHorizontally { -it } },
+        popEnterTransition = { slideInHorizontally { -it } },
+        popExitTransition = { slideOutHorizontally { it } }
+    ) {
+        composable(Screens.WeatherScreen.route) {
             WeatherScreen(
                 weatherResponse,
                 onForecastClick = {
                     navController.navigate(Screens.FiveDayForecastScreen.route)
+                },
+                onRefresh = {
+                    navController.navigate(Screens.WeatherScreen.route)
                 }
             )
         }
-        composable(Screens.FiveDayForecastScreen.route){
+        composable(Screens.FiveDayForecastScreen.route) {
             WeatherForecast(
                 weatherResponse,
                 onBackClick = {
