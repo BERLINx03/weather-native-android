@@ -28,10 +28,12 @@ import com.example.weatherinstabug.WeatherApplication
 import com.example.weatherinstabug.data.WeatherResponse
 import com.example.weatherinstabug.domain.repository.WeatherCallback
 import com.example.weatherinstabug.domain.repository.WeatherRepository
+import com.example.weatherinstabug.presentation.state.WeatherScreenState
 import com.example.weatherinstabug.presentation.ui.WeatherApp
+import com.example.weatherinstabug.presentation.ui.components.PermissionScreen
 import com.example.weatherinstabug.utils.LocationUtils
 
-class MainActivity : ComponentActivity() {
+class MainActivity : ComponentActivity(), WeatherController.StateCallback {
 
     private val requiredPermission = arrayOf(
         android.Manifest.permission.ACCESS_FINE_LOCATION,
@@ -49,108 +51,85 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    private var weatherState by mutableStateOf<WeatherResponse?>(null)
-    private var locationState by mutableStateOf<Pair<Double, Double>?>(null)
-    private var isLoading by mutableStateOf(true)
-    private var errorMessage by mutableStateOf<String?>(null)
+    private var weatherController: WeatherController? = null
 
-    private lateinit var weatherRepository: WeatherRepository
+    private var screenState by mutableStateOf<WeatherScreenState>(WeatherScreenState.Loading)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        
-        weatherRepository = (application as WeatherApplication).appContainer.weatherRepository
+
+        val repository = (application as WeatherApplication).appContainer.weatherRepository
+        val controller = WeatherController(applicationContext, repository)
+        controller.setCallback(this)
+        weatherController = controller
 
         if (savedInstanceState != null) {
-            weatherState = savedInstanceState.getParcelable("weatherState")
-            isLoading = false
+            val savedWeather = savedInstanceState.getParcelable<WeatherResponse>("weatherState")
+            if (savedWeather != null) {
+                screenState = WeatherScreenState.Success(savedWeather)
+            }
         } else {
             if (!hasRequiredPermissions()) {
-                ActivityCompat.requestPermissions(
-                    this,
-                    requiredPermission,
-                    0
-                )
+                screenState = WeatherScreenState.PermissionRequired
+                ActivityCompat.requestPermissions(this, requiredPermission, PERMISSION_REQUEST_CODE)
             } else {
-                initializeLocationAndWeather()
+                weatherController?.fetchWeather()
             }
         }
 
         setContent {
-            Log.i("Weather", "my response is : $weatherState")
-            when {
-                isLoading -> LoadingScreen()
-                errorMessage != null -> ErrorScreen(errorMessage!!) {
-                    errorMessage = null
-                    isLoading = true
-                    initializeLocationAndWeather()
+            Log.i("Weather", "Current state: $screenState")
+            when (val state = screenState) {
+                is WeatherScreenState.Loading -> LoadingScreen()
+                is WeatherScreenState.Error -> ErrorScreen(state.message) {
+                    weatherController?.fetchWeather()
                 }
-                weatherState != null -> WeatherApp(weatherResponse = weatherState!!)
-                else -> LoadingScreen()
+                is WeatherScreenState.Success -> WeatherApp(weatherResponse = state.data)
+                is WeatherScreenState.PermissionRequired -> PermissionScreen {
+                    ActivityCompat.requestPermissions(
+                        this, requiredPermission, PERMISSION_REQUEST_CODE
+                    )
+                }
             }
         }
     }
 
-    private fun initializeLocationAndWeather() {
-        if (hasRequiredPermissions()) {
-            try {
-                LocationUtils(this, object : LocationUtils.LocationCallback {
-                    override fun onLocationReceived(coordinates: Pair<Double, Double>) {
-                        locationState = coordinates
-                        fetchWeather(coordinates)
-                    }
-
-                    override fun onLocationError(errorMessage: String) {
-                        this@MainActivity.errorMessage = errorMessage
-                        isLoading = false
-                    }
-                })
-            } catch (e: Exception) {
-                errorMessage = "Error initializing location services: ${e.message}"
-                isLoading = false
-            }
-        } else {
-            errorMessage = "Location permissions are required"
-            isLoading = false
-        }
+    override fun onStateChanged(state: WeatherScreenState) {
+        screenState = state
     }
 
-    private fun fetchWeather(coordinates: Pair<Double, Double>) {
-        weatherRepository.fetchCurrentWeather(
-            coordinates = coordinates,
-            callback = object : WeatherCallback {
-                override fun onWeatherDataReceived(weatherResponse: WeatherResponse) {
-                    weatherState = weatherResponse
-                    isLoading = false
-                }
-
-                override fun onError(errorMessage: String) {
-                    this@MainActivity.errorMessage = errorMessage
-                    isLoading = false
-                }
-            }
-        )
-    }
-
-    @Deprecated("This method has been deprecated in favor of using the Activity Result API...")
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
+    @Deprecated("This method has been deprecated in favor of using the Activity Result API\n      which brings increased type safety via an {@link ActivityResultContract} and the prebuilt\n      contracts for common intents available in\n      {@link androidx.activity.result.contract.ActivityResultContracts}, provides hooks for\n      testing, and allow receiving results in separate, testable classes independent from your\n      activity. Use\n      {@link #registerForActivityResult(ActivityResultContract, ActivityResultCallback)} passing\n      in a {@link RequestMultiplePermissions} object for the {@link ActivityResultContract} and\n      handling the result in the {@link ActivityResultCallback#onActivityResult(Object) callback}.")
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<String>,
+        grantResults: IntArray
+    ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (requestCode == 0 && grantResults.isNotEmpty() && grantResults.all { it == PackageManager.PERMISSION_GRANTED }) {
-            initializeLocationAndWeather()
-        } else {
-            errorMessage = "Location permissions denied"
-            isLoading = false
+
+        if (requestCode == PERMISSION_REQUEST_CODE) {
+            if (grantResults.isNotEmpty() && grantResults.all { it == PackageManager.PERMISSION_GRANTED }) {
+                weatherController?.fetchWeather()
+            } else {
+                screenState = WeatherScreenState.Error("Location permissions are required")
+            }
         }
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        outState.putParcelable("weatherState", weatherState)
+        if (screenState is WeatherScreenState.Success) {
+            outState.putParcelable("weatherState", (screenState as WeatherScreenState.Success).data)
+        }
     }
 
     override fun onDestroy() {
+        weatherController?.clear()
+        weatherController = null
         super.onDestroy()
-        weatherRepository.shutdownExecutor()
+    }
+
+    companion object {
+        private const val PERMISSION_REQUEST_CODE = 100
     }
 }
 
