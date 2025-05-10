@@ -1,27 +1,19 @@
 package com.example.weatherinstabug.presentation.ui.components
 
-import android.R.attr.fontWeight
-import android.R.attr.x
-import android.R.attr.y
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
-import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -33,29 +25,23 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Path
-import androidx.compose.ui.graphics.StrokeCap
-import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.weatherinstabug.R
-import com.example.weatherinstabug.data.CurrentConditions
-import com.example.weatherinstabug.data.Day
-import com.example.weatherinstabug.data.WeatherResponse
+import com.example.weatherinstabug.presentation.model.CurrentConditionsUi
+import com.example.weatherinstabug.presentation.model.DayUi
+import com.example.weatherinstabug.presentation.model.WeatherUi
 import java.time.LocalDate
 import java.time.format.TextStyle
 import java.util.Locale
-import kotlin.time.Duration.Companion.days
 
 @Composable
 fun WeatherForecast(
-    weatherResponse: WeatherResponse,
+    weatherUi: WeatherUi,
     onBackClick: () -> Unit
 ) {
 
@@ -86,7 +72,7 @@ fun WeatherForecast(
                     )
                 }
                 Spacer(modifier = Modifier.weight(.6f))
-                val address = weatherResponse.resolvedAddress
+                val address = weatherUi.resolvedAddress
                 if (!address.contains(",")) {
                     Text(
                         text = address,
@@ -96,14 +82,14 @@ fun WeatherForecast(
                     )
                 } else {
                     Text(
-                        text = weatherResponse.timezone,
+                        text = weatherUi.timezone,
                         fontWeight = FontWeight.SemiBold,
                         fontSize = 18.sp,
                         color = Color.White
                     )
                 }
                 Text(
-                    text = "GMT${weatherResponse.tzoffset}",
+                    text = "GMT${weatherUi.tzOffset}",
                     fontWeight = FontWeight.SemiBold,
                     fontSize = 18.sp,
                     color = Color.White,
@@ -113,10 +99,10 @@ fun WeatherForecast(
             }
         }
         item {
-            for (day in weatherResponse.days.slice(1..5)) {
+            for (day in weatherUi.days.slice(1..5)) {
                 DayWeatherItem(
                     day = day,
-                    currentConditions = weatherResponse.currentConditions
+                    currentConditions = weatherUi.currentConditions
                 )
                 HorizontalDivider(modifier = Modifier.padding(horizontal = 12.dp))
             }
@@ -128,8 +114,8 @@ fun WeatherForecast(
 @Composable
 fun DayWeatherItem(
     modifier: Modifier = Modifier,
-    day: Day,
-    currentConditions: CurrentConditions
+    day: DayUi,
+    currentConditions: CurrentConditionsUi
 ) {
     var expanded by remember { mutableStateOf(false) }
     Column(
@@ -151,7 +137,7 @@ fun DayWeatherItem(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = getDayFromDate(day.datetime),
+                text = getDayFromDate(day.dateTime),
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
                 color = Color.White,
@@ -161,7 +147,7 @@ fun DayWeatherItem(
             Spacer(modifier = Modifier.width(60.dp))
 
             Text(
-                text = "${day.tempmax.toInt()}°",
+                text = "${day.tempMax.toInt()}°",
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
                 color = Color.White,
@@ -176,7 +162,7 @@ fun DayWeatherItem(
             )
 
             Text(
-                text = "${day.tempmin.toInt()}°",
+                text = "${day.tempMin.toInt()}°",
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
                 color = Color.White,

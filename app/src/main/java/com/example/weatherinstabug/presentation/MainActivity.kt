@@ -1,7 +1,6 @@
 package com.example.weatherinstabug.presentation
 
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.runtime.getValue
@@ -9,7 +8,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.core.app.ActivityCompat
 import com.example.weatherinstabug.WeatherApplication
-import com.example.weatherinstabug.data.WeatherResponse
+import com.example.weatherinstabug.presentation.model.WeatherUi
 import com.example.weatherinstabug.presentation.state.WeatherScreenState
 import com.example.weatherinstabug.presentation.ui.WeatherApp
 import com.example.weatherinstabug.presentation.ui.components.ErrorScreen
@@ -33,7 +32,7 @@ class MainActivity : ComponentActivity(), WeatherController.StateCallback, Permi
         permissionsHandler = PermissionsHandler(this)
 
         if (savedInstanceState != null) {
-            val savedWeather: WeatherResponse? = savedInstanceState.getParcelable("weatherState")
+            val savedWeather: WeatherUi? = savedInstanceState.getParcelable("weatherState")
             if (savedWeather != null) {
                 screenState = WeatherScreenState.Success(savedWeather)
             }
@@ -55,7 +54,7 @@ class MainActivity : ComponentActivity(), WeatherController.StateCallback, Permi
                 is WeatherScreenState.Error -> ErrorScreen(state.message) {
                     weatherController?.fetchWeather()
                 }
-                is WeatherScreenState.Success -> WeatherApp(weatherResponse = state.data)
+                is WeatherScreenState.Success -> WeatherApp(weatherUi = state.data)
                 is WeatherScreenState.PermissionRequired -> PermissionScreen {
                     ActivityCompat.requestPermissions(
                         this, PermissionsHandler.WEATHER_APP_PERMISSIONS, PERMISSION_REQUEST_CODE

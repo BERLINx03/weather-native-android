@@ -7,9 +7,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -26,13 +24,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.example.weatherinstabug.R
-import com.example.weatherinstabug.data.CurrentConditions
+import com.example.weatherinstabug.presentation.model.CurrentConditionsUi
 import com.example.weatherinstabug.utils.getWindDirectionText
 
 @Composable
 fun FullDayInfo(
     modifier: Modifier = Modifier,
-    currentConditions: CurrentConditions
+    currentConditions: CurrentConditionsUi
 ) {
     Row(
         modifier = modifier.fillMaxWidth()
@@ -41,8 +39,8 @@ fun FullDayInfo(
             modifier = Modifier.fillMaxWidth(.5f)
         ) {
             WindDirection(
-                windDir = currentConditions.winddir,
-                windSpeed = currentConditions.windspeed,
+                windDir = currentConditions.windDir,
+                windSpeed = currentConditions.windSpeed,
                 modifier = Modifier.fillMaxHeight()
             )
 
@@ -62,7 +60,7 @@ fun FullDayInfo(
 
 @Composable
 fun DayInfo(
-    currentConditions: CurrentConditions,
+    currentConditions: CurrentConditionsUi,
     modifier: Modifier = Modifier
 ) {
     Card(
@@ -83,13 +81,13 @@ fun DayInfo(
             ) {
                 InfoItem(title = "Humidity", value = "${currentConditions.humidity}%")
                 HorizontalDivider()
-                InfoItem(title = "Real feel", value = "${currentConditions.feelslike.toInt()}°")
+                InfoItem(title = "Real feel", value = "${currentConditions.feelsLike.toInt()}°")
                 HorizontalDivider()
-                InfoItem(title = "UV", value = currentConditions.uvindex.toString())
+                InfoItem(title = "UV", value = currentConditions.uvIndex.toString())
                 HorizontalDivider()
                 InfoItem(title = "Pressure", value = "${currentConditions.pressure.toInt()} mbar")
                 HorizontalDivider()
-                InfoItem(title = "Chance of rain", value = "${currentConditions.precipprob}%")
+                InfoItem(title = "Chance of rain", value = "${currentConditions.precipProb}%")
             }
         }
     }

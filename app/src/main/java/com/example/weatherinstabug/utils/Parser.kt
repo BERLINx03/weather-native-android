@@ -1,12 +1,12 @@
 package com.example.weatherinstabug.utils
 
-import com.example.weatherinstabug.data.CurrentConditions
-import com.example.weatherinstabug.data.Day
-import com.example.weatherinstabug.data.Hour
-import com.example.weatherinstabug.data.WeatherResponse
+import com.example.weatherinstabug.data.CurrentConditionsDto
+import com.example.weatherinstabug.data.DayDto
+import com.example.weatherinstabug.data.HourDto
+import com.example.weatherinstabug.data.WeatherResponseDto
 import org.json.JSONObject
 
-fun parseResponseIntoWeather(response: String): WeatherResponse {
+fun parseResponseIntoWeather(response: String): WeatherResponseDto {
     val jsonObj = JSONObject(response)
     val latitude = jsonObj.getDouble("latitude")
     val longitude = jsonObj.getDouble("longitude")
@@ -17,7 +17,7 @@ fun parseResponseIntoWeather(response: String): WeatherResponse {
 
     // Parse current conditions
     val currentConditions = jsonObj.getJSONObject("currentConditions")
-    val current = CurrentConditions(
+    val current = CurrentConditionsDto(
         datetime = currentConditions.getString("datetime"),
         temp = currentConditions.getDouble("temp").toCelsius(),
         feelslike = currentConditions.getDouble("feelslike").toCelsius(),
@@ -35,18 +35,18 @@ fun parseResponseIntoWeather(response: String): WeatherResponse {
     )
 
     val daysArray = jsonObj.getJSONArray("days")
-    val days = mutableListOf<Day>()
+    val dayDtos = mutableListOf<DayDto>()
 
     for (i in 0 until daysArray.length()) {
         val dayObj = daysArray.getJSONObject(i)
 
         val hoursArray = dayObj.getJSONArray("hours")
-        val hours = mutableListOf<Hour>()
+        val hourDtos = mutableListOf<HourDto>()
 
         for (j in 0 until hoursArray.length()) {
             val hourObj = hoursArray.getJSONObject(j)
-            hours.add(
-                Hour(
+            hourDtos.add(
+                HourDto(
                     datetime = hourObj.getString("datetime"),
                     temp = hourObj.getDouble("temp").toCelsius(),
                     windspeed = hourObj.getDouble("windspeed"),
@@ -56,8 +56,8 @@ fun parseResponseIntoWeather(response: String): WeatherResponse {
             )
         }
 
-        days.add(
-            Day(
+        dayDtos.add(
+            DayDto(
                 datetime = dayObj.getString("datetime"),
                 tempmax = dayObj.getDouble("tempmax").toCelsius(),
                 tempmin = dayObj.getDouble("tempmin").toCelsius(),
@@ -67,19 +67,19 @@ fun parseResponseIntoWeather(response: String): WeatherResponse {
                 precipprob = dayObj.getDouble("precipprob"),
                 windspeed = dayObj.getDouble("windspeed"),
                 winddir = getWindDirectionText(dayObj.getDouble("winddir")),
-                hours = hours
+                hourDtos = hourDtos
             )
         )
     }
 
-    return WeatherResponse(
+    return WeatherResponseDto(
         latitude = latitude,
         longitude = longitude,
         timezone = timezone,
         resolvedAddress = resolvedAddress,
         description = description,
-        currentConditions = current,
-        days = days,
+        currentConditionsDto = current,
+        dayDtos = dayDtos,
         tzoffset = tzoffset
     )
 }

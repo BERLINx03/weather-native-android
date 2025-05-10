@@ -23,18 +23,17 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.weatherinstabug.R
-import com.example.weatherinstabug.data.Day
+import com.example.weatherinstabug.presentation.model.DayUi
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
 @Composable
 fun FiveDaysForecastCard(
     modifier: Modifier = Modifier,
-    days: List<Day> = emptyList(),
+    days: List<DayUi> = emptyList(),
     onForecastClick: () -> Unit = {}
 ) {
     Card(
@@ -91,7 +90,7 @@ fun FiveDaysForecastCard(
 }
 
 @Composable
-fun DayItem(day: Day) {
+fun DayItem(day: DayUi) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Center,
@@ -106,7 +105,7 @@ fun DayItem(day: Day) {
                 .size(30.dp)
         )
         Text(
-            text = parseDate(day.datetime),
+            text = parseDate(day.dateTime),
             fontWeight = FontWeight.SemiBold,
             fontSize = 16.sp,
             modifier = Modifier.padding(end = 12.dp),
@@ -123,7 +122,7 @@ fun DayItem(day: Day) {
         Spacer(modifier = Modifier.weight(1f))
 
         Text(
-            text = "${day.tempmax.toInt()}°",
+            text = "${day.tempMax.toInt()}°",
             fontWeight = FontWeight.SemiBold,
             fontSize = 16.sp,
             color = Color.White,
@@ -135,18 +134,12 @@ fun DayItem(day: Day) {
             color = Color.White
         )
         Text(
-            text = "${day.tempmin.toInt()}° ",
+            text = "${day.tempMin.toInt()}° ",
             fontWeight = FontWeight.SemiBold,
             fontSize = 16.sp,
             color = Color.White
         )
     }
-}
-
-@Preview
-@Composable
-fun DayItemPreview() {
-    DayItem(day = Day("", 0.0, 0.0,0.0, "", "", 0.0, 0.0, "", emptyList()))
 }
 
 fun parseDate(date: String): String {

@@ -30,17 +30,16 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.weatherinstabug.R
-import com.example.weatherinstabug.data.Hour
+import com.example.weatherinstabug.presentation.model.HourUi
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 
 @Composable
 fun HourlyForecast(
     modifier: Modifier = Modifier,
-    hours: List<Hour>
+    hours: List<HourUi>
 ) {
     Card(
         modifier = modifier
@@ -96,7 +95,7 @@ fun HourlyForecast(
 @Composable
 fun HourlyForecastItem(
     modifier: Modifier = Modifier,
-    hour: Hour
+    hour: HourUi
 ) {
     Card(
         modifier = modifier
@@ -123,7 +122,7 @@ fun HourlyForecastItem(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = if (isSameHour(hour.datetime)) "Now" else takeHour(hour.datetime),
+                    text = if (isSameHour(hour.dateTime)) "Now" else takeHour(hour.dateTime),
                     style = MaterialTheme.typography.bodyLarge,
                     color = Color.White,
                     fontWeight = FontWeight.SemiBold
@@ -137,7 +136,7 @@ fun HourlyForecastItem(
 
                 ) {
                     Text(
-                        text = "${hour.precipprob.toInt()}%",
+                        text = "${hour.precipProb.toInt()}%",
                         style = MaterialTheme.typography.labelLarge,
                         color = Color(0xFFFFFFFF),
                         modifier = Modifier.padding(bottom = 8.dp),
@@ -179,17 +178,4 @@ fun takeHour(timeStr: String): String {
     val hourIn12 = if (hour == 0 || hour == 12) 12 else hour % 12
     val period = if (isPM) "PM" else "AM"
     return "$hourIn12 $period"
-}
-
-@Preview
-@Composable
-fun HourlyForecastPreview() {
-    HourlyForecast(
-        hours =
-            listOf(
-                Hour("17:00:00", 12.3, 423.3, "clear", 12.0),
-                Hour("11:00:00", 12.3, 423.3, "cloudy", 14.0),
-                Hour("15:00:00", 12.3, 423.3, "cloudy", 31.2)
-            )
-    )
 }

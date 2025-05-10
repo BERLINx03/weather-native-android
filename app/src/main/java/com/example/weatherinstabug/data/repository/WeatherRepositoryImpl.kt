@@ -7,6 +7,7 @@ import com.example.weatherinstabug.domain.repository.WeatherDataParser
 import com.example.weatherinstabug.domain.repository.WeatherLocalDataSource
 import com.example.weatherinstabug.domain.repository.WeatherRemoteDataSource
 import com.example.weatherinstabug.domain.repository.WeatherRepository
+import com.example.weatherinstabug.presentation.mapper.WeatherMapper
 import com.example.weatherinstabug.utils.Constants
 import java.net.URL
 import java.time.LocalDate
@@ -46,7 +47,9 @@ class WeatherRepositoryImpl(
                     localDataSource.saveWeatherData(jsonData)
                     try {
                         val weatherResponse = parser.parseWeatherData(jsonData)
-                        handler.post { callback.onWeatherDataReceived(weatherResponse) }
+
+                        val weather = WeatherMapper.responseToDomain(weatherResponse)
+                        handler.post { callback.onWeatherDataReceived(weather) }
                     } catch (e: Exception) {
                         handler.post { callback.onError("Failed to parse weather data: ${e.message}") }
                     }
@@ -56,7 +59,8 @@ class WeatherRepositoryImpl(
                     if (cachedData != null) {
                         try {
                             val weatherResponse = parser.parseWeatherData(cachedData)
-                            handler.post { callback.onWeatherDataReceived(weatherResponse) }
+                            val weather = WeatherMapper.responseToDomain(weatherResponse)
+                            handler.post { callback.onWeatherDataReceived(weather) }
                         } catch (e: Exception) {
                             handler.post { callback.onError("Failed to parse cached data: ${e.message}") }
                         }

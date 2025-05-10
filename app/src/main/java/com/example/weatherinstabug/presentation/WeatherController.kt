@@ -1,9 +1,10 @@
 package com.example.weatherinstabug.presentation
 
 import android.content.Context
-import com.example.weatherinstabug.data.WeatherResponse
+import com.example.weatherinstabug.domain.model.Weather
 import com.example.weatherinstabug.domain.repository.WeatherCallback
 import com.example.weatherinstabug.domain.repository.WeatherRepository
+import com.example.weatherinstabug.presentation.mapper.WeatherMapper
 import com.example.weatherinstabug.presentation.state.WeatherScreenState
 import com.example.weatherinstabug.utils.LocationUtils
 
@@ -33,8 +34,9 @@ class WeatherController(
                     weatherRepository.fetchCurrentWeather(
                         coordinates = coordinates,
                         callback = object : WeatherCallback {
-                            override fun onWeatherDataReceived(weatherResponse: WeatherResponse) {
-                                callback?.onStateChanged(WeatherScreenState.Success(weatherResponse))
+                            override fun onWeatherDataReceived(weather: Weather) {
+                                val weatherUi = WeatherMapper.domainToUi(weather)
+                                callback?.onStateChanged(WeatherScreenState.Success(weatherUi))
                             }
 
                             override fun onError(errorMessage: String) {

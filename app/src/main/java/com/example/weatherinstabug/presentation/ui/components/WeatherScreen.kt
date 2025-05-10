@@ -34,12 +34,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.weatherinstabug.R
-import com.example.weatherinstabug.data.WeatherResponse
+import com.example.weatherinstabug.presentation.model.WeatherUi
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun WeatherScreen(
-    weatherResponse: WeatherResponse,
+    weatherUi: WeatherUi,
     onForecastClick: () -> Unit,
     onRefresh: () -> Unit,
 ) {
@@ -69,7 +69,7 @@ fun WeatherScreen(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.Center
                 ) {
-                    val address = weatherResponse.resolvedAddress
+                    val address = weatherUi.resolvedAddress
                     if (!address.contains(",")) {
                         Text(
                             text = address,
@@ -79,7 +79,7 @@ fun WeatherScreen(
                         )
                     } else {
                         Text(
-                            text = weatherResponse.timezone,
+                            text = weatherUi.timezone,
                             fontWeight = FontWeight.SemiBold,
                             fontSize = 22.sp,
                             color = Color.White
@@ -96,7 +96,7 @@ fun WeatherScreen(
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = "${weatherResponse.days[0].temp.toInt()}",
+                        text = "${weatherUi.days[0].temp.toInt()}",
                         fontSize = 120.sp,
                         modifier = Modifier.padding(end = 16.dp),
                         color = Color.White,
@@ -118,7 +118,7 @@ fun WeatherScreen(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
-                            text = weatherResponse.currentConditions.conditions,
+                            text = weatherUi.currentConditions.conditions,
                             fontWeight = FontWeight.SemiBold,
                             fontSize = 18.sp,
                             modifier = Modifier.padding(end = 12.dp),
@@ -126,7 +126,7 @@ fun WeatherScreen(
                         )
 
                         Text(
-                            text = "${weatherResponse.days[0].tempmax.toInt()}°",
+                            text = "${weatherUi.days[0].tempMax.toInt()}°",
                             fontWeight = FontWeight.SemiBold,
                             fontSize = 18.sp,
                             color = Color.White,
@@ -141,7 +141,7 @@ fun WeatherScreen(
                             color = Color.White
                         )
                         Text(
-                            text = "${weatherResponse.days[0].tempmin.toInt()}°",
+                            text = "${weatherUi.days[0].tempMin.toInt()}°",
                             fontWeight = FontWeight.SemiBold,
                             fontSize = 18.sp,
                             color = Color.White,
@@ -170,7 +170,7 @@ fun WeatherScreen(
                                 tint = Color.White
                             )
                             Text(
-                                text = weatherResponse.description,
+                                text = weatherUi.description,
                                 fontSize = 14.sp,
                                 modifier = Modifier.padding(12.dp),
                                 color = Color.White,
@@ -188,7 +188,7 @@ fun WeatherScreen(
             item {
                 FiveDaysForecastCard(
                     modifier = Modifier.padding(16.dp),
-                    days = weatherResponse.days,
+                    days = weatherUi.days,
                     onForecastClick = {
                         onForecastClick()
                     }
@@ -196,14 +196,14 @@ fun WeatherScreen(
             }
             item {
                 HourlyForecast(
-                    hours = weatherResponse.days[0].hours,
+                    hours = weatherUi.days[0].hours,
                     modifier = Modifier.padding(12.dp)
                 )
             }
             item {
                 FullDayInfo(
                     modifier = Modifier.padding(12.dp),
-                    currentConditions = weatherResponse.currentConditions
+                    currentConditions = weatherUi.currentConditions
                 )
             }
         }

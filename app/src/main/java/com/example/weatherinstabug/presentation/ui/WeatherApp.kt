@@ -7,7 +7,7 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.weatherinstabug.data.WeatherResponse
+import com.example.weatherinstabug.presentation.model.WeatherUi
 import com.example.weatherinstabug.presentation.ui.components.WeatherForecast
 import com.example.weatherinstabug.presentation.ui.components.WeatherScreen
 import com.example.weatherinstabug.utils.Screens
@@ -15,7 +15,7 @@ import com.example.weatherinstabug.utils.Screens
 @Composable
 fun WeatherApp(
     modifier: Modifier = Modifier,
-    weatherResponse: WeatherResponse
+    weatherUi: WeatherUi
 ) {
     val navController = rememberNavController()
     NavHost(
@@ -29,7 +29,7 @@ fun WeatherApp(
     ) {
         composable(Screens.WeatherScreen.route) {
             WeatherScreen(
-                weatherResponse,
+                weatherUi,
                 onForecastClick = {
                     navController.navigate(Screens.FiveDayForecastScreen.route)
                 },
@@ -40,7 +40,7 @@ fun WeatherApp(
         }
         composable(Screens.FiveDayForecastScreen.route) {
             WeatherForecast(
-                weatherResponse,
+                weatherUi,
                 onBackClick = {
                     navController.navigateUp()
                 }
