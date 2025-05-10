@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -27,6 +28,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.weatherinstabug.R
 import com.example.weatherinstabug.presentation.model.DayUi
+import com.example.weatherinstabug.presentation.ui.theme.CardBlue
+import com.example.weatherinstabug.presentation.ui.theme.PrimaryBlue
+import com.example.weatherinstabug.presentation.ui.theme.TextWhite
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
@@ -38,35 +42,36 @@ fun FiveDaysForecastCard(
 ) {
     Card(
         modifier = modifier
-            .clip(MaterialTheme.shapes.medium),
+            .clip(RoundedCornerShape(24.dp)),
         colors = CardDefaults.cardColors(
-            containerColor = Color(0xFF6F92CC)
+            containerColor = CardBlue.copy(alpha = 0.9f)
         ),
         elevation = CardDefaults.cardElevation(
-            defaultElevation = 4.dp
+            defaultElevation = 6.dp
         )
     ) {
         Column(
             modifier = Modifier
-                .padding(12.dp)
+                .padding(16.dp)
         ) {
             Row (
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.padding(bottom = 8.dp)
             ){
                 Icon(
                     painter = painterResource(id = R.drawable.hot),
                     contentDescription = null,
                     modifier = Modifier
-                        .size(25.dp)
+                        .size(28.dp)
                         .padding(start = 8.dp),
-                    tint = Color.White
+                    tint = TextWhite
                 )
-                Spacer(modifier = Modifier.width(8.dp))
+                Spacer(modifier = Modifier.width(12.dp))
                 Text(
                     text = "5-days Forecast",
-                    fontWeight = FontWeight.Normal,
-                    fontSize = 16.sp,
-                    color = Color.White
+                    fontWeight = FontWeight.SemiBold,
+                    fontSize = 18.sp,
+                    color = TextWhite
                 )
             }
             for (day in days.take(3)) {
@@ -76,14 +81,24 @@ fun FiveDaysForecastCard(
             Button(
                 modifier = Modifier
                     .fillMaxWidth(.8f)
+                    .padding(top = 12.dp)
                     .align(Alignment.CenterHorizontally),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor =Color(0xFF4760D1),
-                    contentColor = MaterialTheme.colorScheme.onPrimary
+                    containerColor = PrimaryBlue,
+                    contentColor = TextWhite
+                ),
+                shape = RoundedCornerShape(16.dp),
+                elevation = ButtonDefaults.buttonElevation(
+                    defaultElevation = 4.dp
                 ),
                 onClick = onForecastClick
             ) {
-                Text(text = "5-day forecast")
+                Text(
+                    text = "5-day forecast",
+                    fontWeight = FontWeight.Medium,
+                    fontSize = 16.sp,
+                    modifier = Modifier.padding(vertical = 4.dp)
+                )
             }
         }
     }
@@ -95,49 +110,50 @@ fun DayItem(day: DayUi) {
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Center,
         modifier = Modifier
-            .padding(horizontal = 2.dp)
+            .fillMaxWidth()
+            .padding(vertical = 10.dp, horizontal = 8.dp)
     ) {
         Image(
             painter = painterResource(id = getCurrentWeatherIcon(day.icon)),
             contentDescription = null,
             modifier = Modifier
-                .padding(top = 12.dp, end = 12.dp, bottom = 12.dp)
-                .size(30.dp)
+                .padding(end = 12.dp)
+                .size(36.dp)
         )
         Text(
             text = parseDate(day.dateTime),
             fontWeight = FontWeight.SemiBold,
             fontSize = 16.sp,
             modifier = Modifier.padding(end = 12.dp),
-            color = Color.White
+            color = TextWhite
         )
         Spacer(modifier = Modifier.width(8.dp))
         Text(
             text = day.conditions,
-            fontWeight = FontWeight.SemiBold,
+            fontWeight = FontWeight.Normal,
             fontSize = 16.sp,
-            color = Color.White,
+            color = TextWhite.copy(alpha = 0.9f),
             modifier = Modifier.padding(end = 12.dp)
         )
         Spacer(modifier = Modifier.weight(1f))
 
         Text(
             text = "${day.tempMax.toInt()}°",
-            fontWeight = FontWeight.SemiBold,
+            fontWeight = FontWeight.Bold,
             fontSize = 16.sp,
-            color = Color.White,
+            color = TextWhite,
         )
 
         Text(
             " / ",
             fontSize = 20.sp,
-            color = Color.White
+            color = TextWhite.copy(alpha = 0.8f)
         )
         Text(
             text = "${day.tempMin.toInt()}° ",
             fontWeight = FontWeight.SemiBold,
             fontSize = 16.sp,
-            color = Color.White
+            color = TextWhite.copy(alpha = 0.8f)
         )
     }
 }

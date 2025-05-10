@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
@@ -20,11 +21,15 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.weatherinstabug.R
 import com.example.weatherinstabug.presentation.model.CurrentConditionsUi
+import com.example.weatherinstabug.presentation.ui.theme.CardBlue
+import com.example.weatherinstabug.presentation.ui.theme.TextWhite
 import com.example.weatherinstabug.utils.getWindDirectionText
 
 @Composable
@@ -33,10 +38,12 @@ fun FullDayInfo(
     currentConditions: CurrentConditionsUi
 ) {
     Row(
-        modifier = modifier.fillMaxWidth()
+        modifier = modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         Column(
-            modifier = Modifier.fillMaxWidth(.5f)
+            modifier = Modifier.weight(1f),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             WindDirection(
                 windDir = currentConditions.windDir,
@@ -49,13 +56,12 @@ fun FullDayInfo(
                 sunset = currentConditions.sunset
             )
         }
-        Spacer(Modifier.width(8.dp))
         Column(
+            modifier = Modifier.weight(1f)
         ) {
             DayInfo(currentConditions = currentConditions)
         }
     }
-
 }
 
 @Composable
@@ -65,28 +71,41 @@ fun DayInfo(
 ) {
     Card(
         modifier = modifier,
-        shape = MaterialTheme.shapes.large,
+        shape = RoundedCornerShape(24.dp),
         elevation = CardDefaults.cardElevation(
-            defaultElevation = 4.dp
+            defaultElevation = 6.dp
         )
     ) {
         Box(
             modifier = Modifier
-                .background(Color(0xFF6F92CC))
+                .background(CardBlue.copy(alpha = 0.9f))
         ) {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(16.dp)
             ) {
+                Text(
+                    text = "Weather Details",
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = TextWhite,
+                    modifier = Modifier.padding(bottom = 8.dp)
+                )
+                
+                HorizontalDivider(
+                    color = TextWhite.copy(alpha = 0.2f),
+                    thickness = 1.dp
+                )
+                
                 InfoItem(title = "Humidity", value = "${currentConditions.humidity}%")
-                HorizontalDivider()
+                HorizontalDivider(color = TextWhite.copy(alpha = 0.1f))
                 InfoItem(title = "Real feel", value = "${currentConditions.feelsLike.toInt()}°")
-                HorizontalDivider()
-                InfoItem(title = "UV", value = currentConditions.uvIndex.toString())
-                HorizontalDivider()
+                HorizontalDivider(color = TextWhite.copy(alpha = 0.1f))
+                InfoItem(title = "UV Index", value = currentConditions.uvIndex.toString())
+                HorizontalDivider(color = TextWhite.copy(alpha = 0.1f))
                 InfoItem(title = "Pressure", value = "${currentConditions.pressure.toInt()} mbar")
-                HorizontalDivider()
+                HorizontalDivider(color = TextWhite.copy(alpha = 0.1f))
                 InfoItem(title = "Chance of rain", value = "${currentConditions.precipProb}%")
             }
         }
@@ -101,12 +120,22 @@ fun InfoItem(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(8.dp),
-        horizontalArrangement = Arrangement.SpaceBetween
+            .padding(vertical = 10.dp, horizontal = 8.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(title, color = Color.White)
+        Text(
+            text = title, 
+            color = TextWhite,
+            fontSize = 16.sp
+        )
         Spacer(Modifier.weight(1f))
-        Text(value, color = Color.White)
+        Text(
+            text = value, 
+            color = TextWhite,
+            fontWeight = FontWeight.SemiBold,
+            fontSize = 16.sp
+        )
     }
 }
 
@@ -117,15 +146,18 @@ fun WindDirection(
     modifier: Modifier = Modifier
 ) {
     Card(
-        modifier = modifier
-            .padding(bottom = 8.dp),
-        shape = MaterialTheme.shapes.large,
+        modifier = modifier,
+        shape = RoundedCornerShape(24.dp),
         colors = CardDefaults.cardColors(
-            containerColor = Color(0xFF6F92CC)
+            containerColor = CardBlue.copy(alpha = 0.9f)
         ),
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = 6.dp
+        )
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.padding(vertical = 8.dp)
         ) {
             Column(
                 modifier = Modifier
@@ -134,27 +166,25 @@ fun WindDirection(
             ) {
                 Text(
                     getWindDirectionText(windDir),
-                    color = Color.White,
+                    color = TextWhite,
                     modifier = Modifier.padding(bottom = 8.dp),
-                    fontSize = MaterialTheme.typography.titleMedium.fontSize,
-                    fontWeight = MaterialTheme.typography.titleMedium.fontWeight,
-                    lineHeight = MaterialTheme.typography.titleMedium.lineHeight
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold
                 )
                 Text(
                     "Wind speed: $windSpeed km/h",
-                    color = Color.White,
-                    fontSize = MaterialTheme.typography.bodyMedium.fontSize,
-                    fontWeight = MaterialTheme.typography.bodyMedium.fontWeight,
-                    lineHeight = MaterialTheme.typography.bodyMedium.lineHeight
+                    color = TextWhite.copy(alpha = 0.9f),
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Medium
                 )
             }
             Icon(
                 painter = painterResource(id = R.drawable.compass_icon),
-                contentDescription = "Wind icon",
-                tint = Color.White,
+                contentDescription = "Wind direction",
+                tint = TextWhite,
                 modifier = Modifier
-                    .padding(8.dp)
-                    .size(40.dp)
+                    .padding(end = 16.dp)
+                    .size(42.dp)
             )
         }
     }
@@ -168,13 +198,17 @@ fun SunriseSunset(
 ) {
     Card(
         modifier = modifier,
-        shape = MaterialTheme.shapes.large,
+        shape = RoundedCornerShape(24.dp),
         colors = CardDefaults.cardColors(
-            containerColor = Color(0xFF6F92CC)
+            containerColor = CardBlue.copy(alpha = 0.9f)
+        ),
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = 6.dp
         )
     ) {
         Row(
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.padding(vertical = 8.dp)
         ) {
             Column(
                 modifier = Modifier
@@ -183,24 +217,25 @@ fun SunriseSunset(
             ) {
                 Text(
                     "Sunrise: $sunrise",
-                    color = Color.White,
+                    color = TextWhite,
                     modifier = Modifier.padding(bottom = 8.dp),
-                    fontSize = MaterialTheme.typography.titleMedium.fontSize,
-                    fontWeight = MaterialTheme.typography.titleMedium.fontWeight,
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.SemiBold
                 )
                 Text(
-                    "Sunset: $sunset", color = Color.White,
-                    fontSize = MaterialTheme.typography.bodyMedium.fontSize,
-                    fontWeight = MaterialTheme.typography.bodyMedium.fontWeight,
+                    "Sunset: $sunset", 
+                    color = TextWhite.copy(alpha = 0.9f),
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Medium
                 )
             }
             Icon(
                 painter = painterResource(id = R.drawable.sunrise),
-                contentDescription = "Sunrise icon",
-                tint = Color.White,
+                contentDescription = "Sunrise and sunset",
+                tint = TextWhite,
                 modifier = Modifier
-                    .padding(8.dp)
-                    .size(40.dp)
+                    .padding(end = 16.dp)
+                    .size(42.dp)
             )
         }
     }

@@ -1,8 +1,12 @@
 package com.example.weatherinstabug.presentation.ui.components
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.slideInVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -14,19 +18,21 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -35,6 +41,8 @@ import com.example.weatherinstabug.R
 import com.example.weatherinstabug.presentation.model.CurrentConditionsUi
 import com.example.weatherinstabug.presentation.model.DayUi
 import com.example.weatherinstabug.presentation.model.WeatherUi
+import com.example.weatherinstabug.presentation.ui.theme.DefaultGradient
+import com.example.weatherinstabug.presentation.ui.theme.TextWhite
 import java.time.LocalDate
 import java.time.format.TextStyle
 import java.util.Locale
@@ -44,71 +52,132 @@ fun WeatherForecast(
     weatherUi: WeatherUi,
     onBackClick: () -> Unit
 ) {
+    var visible by remember { mutableStateOf(false) }
+    
+    LaunchedEffect(key1 = true) {
+        visible = true
+    }
 
     LazyColumn(
         Modifier
             .fillMaxSize()
             .background(
-                Brush.linearGradient(
-                    colors = listOf(Color(0xFF4760D1), Color(0xFF89CFF0))
+                Brush.verticalGradient(
+                    colors = DefaultGradient
                 )
             )
     ) {
         item {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(12.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                IconButton(
-                    onClick = { onBackClick() },
-                ) {
-                    Icon(
-                        painter = painterResource(R.drawable.back),
-                        contentDescription = null,
-                        modifier = Modifier.size(30.dp),
-                        tint = Color.White
-                    )
-                }
-                Spacer(modifier = Modifier.weight(.6f))
-                val address = weatherUi.resolvedAddress
-                if (!address.contains(",")) {
-                    Text(
-                        text = address,
-                        fontWeight = FontWeight.SemiBold,
-                        fontSize = 18.sp,
-                        color = Color.White
-                    )
-                } else {
-                    Text(
-                        text = weatherUi.timezone,
-                        fontWeight = FontWeight.SemiBold,
-                        fontSize = 18.sp,
-                        color = Color.White
-                    )
-                }
-                Text(
-                    text = "GMT${weatherUi.tzOffset}",
-                    fontWeight = FontWeight.SemiBold,
-                    fontSize = 18.sp,
-                    color = Color.White,
-                    modifier = Modifier.padding(start = 12.dp)
+            AnimatedVisibility(
+                visible = visible,
+                enter = fadeIn(tween(800)) + slideInVertically(
+                    initialOffsetY = { -40 },
+                    animationSpec = tween(800)
                 )
-                Spacer(modifier = Modifier.weight(1f))
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    IconButton(
+                        onClick = { onBackClick() },
+                        modifier = Modifier
+                            .clip(CircleShape)
+                            .background(TextWhite.copy(alpha = 0.2f))
+                            .padding(4.dp)
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.back),
+                            contentDescription = "Back",
+                            modifier = Modifier.size(28.dp),
+                            tint = TextWhite
+                        )
+                    }
+                    Spacer(modifier = Modifier.weight(.4f))
+                    val address = weatherUi.resolvedAddress
+                    if (!address.contains(",")) {
+                        Text(
+                            text = address,
+                            fontWeight = FontWeight.SemiBold,
+                            fontSize = 20.sp,
+                            color = TextWhite
+                        )
+                    } else {
+                        Text(
+                            text = weatherUi.timezone,
+                            fontWeight = FontWeight.SemiBold,
+                            fontSize = 20.sp,
+                            color = TextWhite
+                        )
+                    }
+                    Text(
+                        text = "GMT${weatherUi.tzOffset}",
+                        fontWeight = FontWeight.Normal,
+                        fontSize = 16.sp,
+                        color = TextWhite.copy(alpha = 0.8f),
+                        modifier = Modifier.padding(start = 12.dp)
+                    )
+                    Spacer(modifier = Modifier.weight(1f))
+                }
             }
         }
+        
         item {
-            for (day in weatherUi.days.slice(1..5)) {
-                DayWeatherItem(
-                    day = day,
-                    currentConditions = weatherUi.currentConditions
+            AnimatedVisibility(
+                visible = visible,
+                enter = fadeIn(tween(1000)) + slideInVertically(
+                    initialOffsetY = { 40 },
+                    animationSpec = tween(1000)
                 )
-                HorizontalDivider(modifier = Modifier.padding(horizontal = 12.dp))
+            ) {
+                Column {
+                    Text(
+                        text = "5-Day Weather Forecast",
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 22.sp,
+                        color = TextWhite,
+                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+                    )
+                    
+                    HorizontalDivider(
+                        modifier = Modifier.padding(horizontal = 16.dp),
+                        color = TextWhite.copy(alpha = 0.2f),
+                        thickness = 1.dp
+                    )
+                }
             }
+        }
+        
+        item {
+            AnimatedVisibility(
+                visible = visible,
+                enter = fadeIn(tween(1200)) + slideInVertically(
+                    initialOffsetY = { 60 },
+                    animationSpec = tween(1200)
+                )
+            ) {
+                Column {
+                    for (day in weatherUi.days.slice(1..5)) {
+                        DayWeatherItem(
+                            day = day,
+                            currentConditions = weatherUi.currentConditions
+                        )
+                        HorizontalDivider(
+                            modifier = Modifier.padding(horizontal = 16.dp),
+                            color = TextWhite.copy(alpha = 0.1f),
+                            thickness = 0.5.dp
+                        )
+                    }
+                }
+            }
+        }
+        
+        item {
+            Spacer(modifier = Modifier.padding(bottom = 24.dp))
         }
     }
-
 }
 
 @Composable
@@ -133,65 +202,64 @@ fun DayWeatherItem(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(12.dp),
+                .padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
                 text = getDayFromDate(day.dateTime),
-                fontSize = 20.sp,
+                fontSize = 22.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color.White,
-                modifier = Modifier.padding(12.dp)
+                color = TextWhite,
+                modifier = Modifier.padding(end = 16.dp)
             )
 
             Spacer(modifier = Modifier.width(60.dp))
 
             Text(
                 text = "${day.tempMax.toInt()}°",
-                fontSize = 20.sp,
+                fontSize = 22.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color.White,
-                modifier = Modifier.padding(12.dp)
+                color = TextWhite,
+                modifier = Modifier.padding(end = 8.dp)
             )
 
             Text(
-                text = " / ",
-                fontSize = 20.sp,
+                text = "/",
+                fontSize = 22.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color.White,
+                color = TextWhite.copy(alpha = 0.7f),
             )
 
             Text(
                 text = "${day.tempMin.toInt()}°",
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color.White,
-                modifier = Modifier.padding(start = 12.dp)
+                fontSize = 22.sp,
+                fontWeight = FontWeight.SemiBold,
+                color = TextWhite.copy(alpha = 0.7f),
+                modifier = Modifier.padding(start = 8.dp)
             )
 
             Spacer(modifier = Modifier.weight(1f))
 
             Icon(
                 painter = painterResource(getCurrentWeatherIcon(day.icon)),
-                contentDescription = null,
+                contentDescription = day.conditions,
                 modifier = Modifier
                     .size(50.dp)
-                    .padding(horizontal = 12.dp),
-                tint = Color.White
+                    .padding(horizontal = 8.dp),
+                tint = TextWhite
             )
         }
 
         if (expanded) {
-            Column {
+            Column(
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+            ) {
                 DayInfo(
-                    modifier = Modifier
-                        .padding(start = 12.dp, end = 12.dp, bottom = 12.dp),
+                    modifier = Modifier.padding(bottom = 16.dp),
                     currentConditions = currentConditions
                 )
                 HourlyForecast(
-                    hours = day.hours,
-                    modifier = Modifier
-                        .padding(horizontal = 12.dp)
+                    hours = day.hours
                 )
             }
         }
@@ -200,5 +268,5 @@ fun DayWeatherItem(
 
 fun getDayFromDate(dateString: String): String {
     val date = LocalDate.parse(dateString)
-    return date.dayOfWeek.getDisplayName(TextStyle.FULL, Locale.getDefault()).substring(0..2)
+    return date.dayOfWeek.getDisplayName(TextStyle.FULL, Locale.getDefault())
 }
