@@ -27,6 +27,7 @@ import androidx.core.content.ContextCompat
 import com.example.weatherinstabug.WeatherApplication
 import com.example.weatherinstabug.data.WeatherResponse
 import com.example.weatherinstabug.domain.repository.WeatherCallback
+import com.example.weatherinstabug.domain.repository.WeatherRepository
 import com.example.weatherinstabug.presentation.ui.WeatherApp
 import com.example.weatherinstabug.utils.LocationUtils
 
@@ -53,10 +54,12 @@ class MainActivity : ComponentActivity() {
     private var isLoading by mutableStateOf(true)
     private var errorMessage by mutableStateOf<String?>(null)
 
-    private val weatherRepository = WeatherApplication.appModule.weatherRepository
+    private lateinit var weatherRepository: WeatherRepository
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        
+        weatherRepository = (application as WeatherApplication).appContainer.weatherRepository
 
         if (savedInstanceState != null) {
             weatherState = savedInstanceState.getParcelable("weatherState")
