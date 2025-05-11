@@ -15,7 +15,8 @@ import com.example.weatherinstabug.utils.Screens
 @Composable
 fun WeatherApp(
     modifier: Modifier = Modifier,
-    weatherUi: WeatherUi
+    weatherUi: WeatherUi,
+    onRefresh: () -> Unit
 ) {
     val navController = rememberNavController()
     NavHost(
@@ -34,7 +35,7 @@ fun WeatherApp(
                     navController.navigate(Screens.FiveDayForecastScreen.route)
                 },
                 onRefresh = {
-                    navController.navigate(Screens.WeatherScreen.route)
+                    onRefresh()
                 }
             )
         }

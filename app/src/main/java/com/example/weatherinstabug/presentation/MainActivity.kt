@@ -54,7 +54,12 @@ class MainActivity : ComponentActivity(), WeatherController.StateCallback, Permi
                 is WeatherScreenState.Error -> ErrorScreen(state.message) {
                     weatherController?.fetchWeather()
                 }
-                is WeatherScreenState.Success -> WeatherApp(weatherUi = state.data)
+                is WeatherScreenState.Success -> WeatherApp(
+                    weatherUi = state.data,
+                    onRefresh = {
+                        weatherController?.fetchWeather()
+                    }
+                )
                 is WeatherScreenState.PermissionRequired -> PermissionScreen {
                     ActivityCompat.requestPermissions(
                         this, PermissionsHandler.WEATHER_APP_PERMISSIONS, PERMISSION_REQUEST_CODE
