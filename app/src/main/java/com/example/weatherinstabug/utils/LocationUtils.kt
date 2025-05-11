@@ -34,10 +34,11 @@ class LocationUtils(private val context: Context, private val locationCallback: 
             locationManager = context.getSystemService(LOCATION_SERVICE) as LocationManager
 
             val isGpsEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
-            val isNetworkEnabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
 
-            if (!isGpsEnabled && !isNetworkEnabled) {
+//            removed as you asked to use GPS
+//            val isNetworkEnabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
 
+            if (!isGpsEnabled) {
                 Log.e("LocationUtils", "No location providers enabled")
                 reportError("Please enable location services in your device settings")
                 return
@@ -51,19 +52,19 @@ class LocationUtils(private val context: Context, private val locationCallback: 
                     null
                 }
             } else null
-
-            val lastKnownLocationNetwork = if (isNetworkEnabled) {
-                try {
-                    locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER)
-                } catch (e: Exception) {
-                    Log.e("LocationUtils", "Error getting Network last location: ${e.message}")
-                    null
-                }
-            } else null
+//
+//            val lastKnownLocationNetwork = if (isNetworkEnabled) {
+//                try {
+//                    locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER)
+//                } catch (e: Exception) {
+//                    Log.e("LocationUtils", "Error getting Network last location: ${e.message}")
+//                    null
+//                }
+//            } else null
 
             val lastKnownLocation = when {
                 lastKnownLocationGPS != null -> lastKnownLocationGPS
-                lastKnownLocationNetwork != null -> lastKnownLocationNetwork
+//                lastKnownLocationNetwork != null -> lastKnownLocationNetwork
                 else -> null
             }
 
@@ -74,15 +75,14 @@ class LocationUtils(private val context: Context, private val locationCallback: 
                 return
             }
 
-            // If we don't have last location, request updates from available providers
             var requestedUpdates = false
 
             if (isGpsEnabled) {
                 try {
                     locationManager.requestLocationUpdates(
                         LocationManager.GPS_PROVIDER,
-                        5000,
-                        5f,
+                        1000,
+                        0f,
                         this
                     )
                     requestedUpdates = true
@@ -92,20 +92,20 @@ class LocationUtils(private val context: Context, private val locationCallback: 
                 }
             }
 
-            if (isNetworkEnabled) {
-                try {
-                    locationManager.requestLocationUpdates(
-                        LocationManager.NETWORK_PROVIDER,
-                        5000,
-                        5f,
-                        this
-                    )
-                    requestedUpdates = true
-                    Log.d("LocationUtils", "Requested Network updates")
-                } catch (e: Exception) {
-                    Log.e("LocationUtils", "Failed to request Network updates: ${e.message}")
-                }
-            }
+//            if (isNetworkEnabled) {
+//                try {
+//                    locationManager.requestLocationUpdates(
+//                        LocationManager.NETWORK_PROVIDER,
+//                        5000,
+//                        5f,
+//                        this
+//                    )
+//                    requestedUpdates = true
+//                    Log.d("LocationUtils", "Requested Network updates")
+//                } catch (e: Exception) {
+//                    Log.e("LocationUtils", "Failed to request Network updates: ${e.message}")
+//                }
+//            }
 
             if (!requestedUpdates) {
                 reportError("Unable to request location updates")
@@ -116,7 +116,7 @@ class LocationUtils(private val context: Context, private val locationCallback: 
                     reportError("Location timeout - could not determine your location")
                     removeLocationUpdates()
                 }
-            }, 15000)
+            }, 45000)
 
         } catch (e: Exception) {
             Log.e("LocationUtils", "Error in getCurrentLocation: ${e.message}")
